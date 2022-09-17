@@ -1,9 +1,8 @@
 /* eslint-disable react-native/no-unused-styles */
-import React, { useCallback, useMemo } from "react";
-import { Button, Image, Pressable, StyleSheet, View } from "react-native";
+import React, { useCallback } from "react";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fontStyles } from "shared/styles/fonts";
-import { useUser } from "api/useUser";
 import { InterText } from "@shared-components/inter-text/InterText";
 import Icon from "react-native-dynamic-vector-icons";
 import LinearGradient from "react-native-linear-gradient";
@@ -19,6 +18,7 @@ import {
 import { useRooms } from "api/useRooms";
 import { arrayUpsert } from "utils/array";
 import { StatusButton } from "@shared-components/status-button/StatusButton";
+import { useUser } from "api/useUser";
 
 const buttonStyles = (pressed: boolean) =>
   StyleSheet.create({

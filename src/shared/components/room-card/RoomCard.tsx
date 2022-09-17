@@ -1,11 +1,10 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import {
   Image,
   Pressable,
   PressableProps,
   StyleProp,
   StyleSheet,
-  View,
 } from "react-native";
 import { COLORS } from "@shared-constants";
 import { Room } from "types/room";

@@ -1,12 +1,12 @@
 import React, { ReactNode } from "react";
 import { Pressable, StyleProp, StyleSheet, View } from "react-native";
-import { COLORS } from "@shared-constants";
 import { Notification } from "@shared-components/notification/Notification";
 import { InterText } from "@shared-components/inter-text/InterText";
 
 interface InsightNotificationProps {
   insightText: string;
   actionButtonContent: ReactNode;
+  onPressAction: () => void;
   style: StyleProp<any>;
 }
 
@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
 export const InsightNotification = ({
   insightText,
   actionButtonContent,
+  onPressAction,
   style,
 }: InsightNotificationProps) => {
   return (
@@ -44,6 +45,7 @@ export const InsightNotification = ({
             ...styles.notificationButton,
             backgroundColor: pressed ? "#4D4D51" : "#434346",
           })}
+          onPress={onPressAction}
         >
           {actionButtonContent}
         </Pressable>

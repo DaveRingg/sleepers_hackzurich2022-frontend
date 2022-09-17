@@ -85,11 +85,18 @@ export const DashboardScreen: React.FC<any> = ({ navigation }) => {
             Notifications
           </InterText>
           <View style={styles.notificationContainer}>
-            <BlockNotification time="20:21" progressText="32/53 KWh gathered" />
+            <BlockNotification
+              time="20:21"
+              progressText="32/53 KWh gathered"
+              navigation={navigation}
+            />
             <InsightNotification
               insightText="Your kitchen is consuming a high amount of energy"
               actionButtonContent={
                 <Icon type="Feather" name="eye" size={14} color="#fff" />
+              }
+              onPressAction={() =>
+                navigation.navigate(SCREENS.DETAILS, { roomId: rooms[2].id })
               }
               style={{ marginTop: 6 }}
             />
