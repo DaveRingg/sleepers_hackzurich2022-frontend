@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Image,
-  StyleSheet,
-  TextInput,
-  View,
-  Text,
-  Pressable,
-} from "react-native";
+import { Image, StyleSheet, TextInput, View, Pressable } from "react-native";
 import Icon from "react-native-dynamic-vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GradientText from "@shared-components/gradient-text/GradientText";

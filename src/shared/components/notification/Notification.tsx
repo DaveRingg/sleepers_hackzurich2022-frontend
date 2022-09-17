@@ -1,7 +1,5 @@
 import React, { ReactNode } from "react";
 import { StyleProp, StyleSheet, View } from "react-native";
-import MaskedView from "@react-native-community/masked-view";
-import LinearGradient from "react-native-linear-gradient";
 import Icon from "react-native-dynamic-vector-icons";
 import { COLORS } from "@shared-constants";
 

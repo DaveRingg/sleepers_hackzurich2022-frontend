@@ -2,7 +2,7 @@ import { useRecoilState } from "recoil";
 import { userState } from "state/user";
 
 export function useUser() {
-  const [state, setState] = useRecoilState(userState);
+  const [state] = useRecoilState(userState);
 
   return {
     ...state,

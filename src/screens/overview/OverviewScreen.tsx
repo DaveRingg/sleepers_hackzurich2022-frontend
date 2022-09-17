@@ -1,42 +1,12 @@
-/* eslint-disable react-native/no-unused-styles */
-import React, { useCallback, useMemo } from "react";
-import { Button, Image, Pressable, StyleSheet, View } from "react-native";
+import React from "react";
+import { Image, Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fontStyles } from "shared/styles/fonts";
-import { useUser } from "api/useUser";
 import { InterText } from "@shared-components/inter-text/InterText";
 import Icon from "react-native-dynamic-vector-icons";
 import LinearGradient from "react-native-linear-gradient";
 import { ScrollView } from "react-native-gesture-handler";
-import { ERoomStatus } from "types/room";
-import { ROOMS } from "shared/constants/rooms";
-import { COLORS, SCREENS } from "@shared-constants";
-import { Tag } from "@shared-components/tag/InterText";
-import { ScheduleBar } from "@shared-components/schedule-bar/ScheduleBar";
-import { useRefresh } from "hooks/use-refresh";
-
-const buttonStyles = (pressed: boolean) =>
-  StyleSheet.create({
-    button: {
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      backgroundColor: pressed ? "#D3E2E5" : "#DEE9EB",
-      borderRadius: 9999,
-    },
-  });
-
-const styles = StyleSheet.create({
-  buttonText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: COLORS.TEXT,
-  },
-  scheduleAnnotation: {
-    fontSize: 10,
-    fontWeight: "500",
-    color: "#B9B9B9",
-  },
-});
+import { SCREENS } from "@shared-constants";
 
 export const OverviewScreen: React.FC<any> = ({ navigation }) => {
   return (

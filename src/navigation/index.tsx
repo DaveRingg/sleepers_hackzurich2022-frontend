@@ -1,5 +1,4 @@
 import React from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { isReadyRef, navigationRef } from "react-navigation-helpers";
 import { SCREENS } from "@shared-constants";
@@ -8,8 +7,8 @@ import { useUser } from "api/useUser";
 import { DashboardScreen } from "@screens/dashboard/DashboardScreen";
 import { DetailsScreen } from "@screens/details/DetailsScreen";
 import { createStackNavigator } from "@react-navigation/stack";
-import { useRefresh } from "hooks/use-refresh";
 import { OverviewScreen } from "@screens/overview/OverviewScreen";
+import { PreventScreen } from "@screens/prevent/PreventScreen";
 
 // ? If you want to use stack or tab or both
 const Stack = createStackNavigator();
@@ -51,6 +50,11 @@ const Navigation = () => {
             <Stack.Screen
               name={SCREENS.OVERVIEW}
               component={OverviewScreen}
+              options={{ gestureEnabled: true }}
+            />
+            <Stack.Screen
+              name={SCREENS.PREVENT}
+              component={PreventScreen}
               options={{ gestureEnabled: true }}
             />
           </>

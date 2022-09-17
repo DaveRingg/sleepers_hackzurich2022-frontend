@@ -1,6 +1,5 @@
 import React, { ReactNode } from "react";
 import { Pressable, StyleProp, StyleSheet, View } from "react-native";
-import { COLORS } from "@shared-constants";
 import { Notification } from "@shared-components/notification/Notification";
 import { InterText } from "@shared-components/inter-text/InterText";
 

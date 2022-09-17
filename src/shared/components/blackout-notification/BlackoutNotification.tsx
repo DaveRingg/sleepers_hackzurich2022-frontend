@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { COLORS } from "@shared-constants";
+import { COLORS, SCREENS } from "@shared-constants";
 import { Notification } from "@shared-components/notification/Notification";
 import { InterText } from "@shared-components/inter-text/InterText";
 import { ProgressBar } from "@shared-components/progress-bar/ProgressBar";
@@ -8,6 +8,7 @@ import { ProgressBar } from "@shared-components/progress-bar/ProgressBar";
 interface BlackoutNotificationProps {
   time: string;
   progressText: string;
+  navigation: any;
 }
 
 const styles = StyleSheet.create({
@@ -51,6 +52,7 @@ const styles = StyleSheet.create({
 export const BlockNotification = ({
   time,
   progressText,
+  navigation,
 }: BlackoutNotificationProps) => {
   return (
     <Notification
@@ -70,6 +72,7 @@ export const BlockNotification = ({
       }
       titleAction={
         <Pressable
+          onPress={() => navigation.navigate(SCREENS.PREVENT)}
           style={({ pressed }) => ({
             ...styles.notificationButton,
             backgroundColor: pressed ? COLORS.PRIMARY_ACTIVE : COLORS.PRIMARY,

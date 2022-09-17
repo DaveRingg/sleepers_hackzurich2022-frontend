@@ -28,6 +28,7 @@ export const ROOMS: Room[] = [
     id: "living",
     image: "../../assets/images/room.png",
     name: "Living Room",
+    status: ERoomStatus.IDLE,
     schedules: [
       {
         id: "a",
@@ -45,13 +46,19 @@ export const ROOMS: Room[] = [
         stop: 0.8,
       },
     ],
-    status: ERoomStatus.IDLE,
   },
   {
     id: "office",
     image: "../../assets/images/workspace.png",
     name: "Office",
-    schedules: [],
     status: ERoomStatus.IDLE,
+    schedules: [],
+  },
+  {
+    id: "bathroom",
+    image: "../../assets/images/workspace.png",
+    name: "Bathroom",
+    status: ERoomStatus.ON,
+    schedules: [],
   },
 ];

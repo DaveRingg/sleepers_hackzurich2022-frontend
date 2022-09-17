@@ -1,20 +1,18 @@
 /* eslint-disable react-native/no-unused-styles */
 import React from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GradientText from "@shared-components/gradient-text/GradientText";
 import { fontStyles } from "shared/styles/fonts";
 import { useUser } from "api/useUser";
 import { InterText } from "@shared-components/inter-text/InterText";
-import { COLORS, SCREENS } from "@shared-constants";
+import { SCREENS } from "@shared-constants";
 import { BlockNotification } from "@shared-components/blackout-notification/BlackoutNotification";
 import { InsightNotification } from "@shared-components/insight-notification/InsightNotification";
 import Icon from "react-native-dynamic-vector-icons";
 import LinearGradient from "react-native-linear-gradient";
 import { ScrollView } from "react-native-gesture-handler";
 import { RoomCard } from "@shared-components/room-card/RoomCard";
-import { ERoomStatus } from "types/room";
-import { navigate, push } from "react-navigation-helpers";
 import { ROOMS } from "shared/constants/rooms";
 
 const styles = StyleSheet.create({
@@ -69,7 +67,11 @@ export const DashboardScreen: React.FC<any> = ({ navigation }) => {
             Notifications
           </InterText>
           <View style={styles.notificationContainer}>
-            <BlockNotification time="20:21" progressText="32/53 KWh gathered" />
+            <BlockNotification
+              time="20:21"
+              progressText="32/53 KWh gathered"
+              navigation={navigation}
+            />
             <InsightNotification
               insightText="Your kitchen is consuming a high amount of energy"
               actionButtonContent={

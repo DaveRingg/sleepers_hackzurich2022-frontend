@@ -1,14 +1,12 @@
 /* eslint-disable react-native/no-unused-styles */
-import React, { useCallback, useMemo } from "react";
-import { Button, Image, Pressable, StyleSheet, View } from "react-native";
+import React, { useCallback } from "react";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fontStyles } from "shared/styles/fonts";
-import { useUser } from "api/useUser";
 import { InterText } from "@shared-components/inter-text/InterText";
 import Icon from "react-native-dynamic-vector-icons";
 import LinearGradient from "react-native-linear-gradient";
 import { ScrollView } from "react-native-gesture-handler";
-import { RoomCard } from "@shared-components/room-card/RoomCard";
 import { ERoomStatus } from "types/room";
 import { ROOMS } from "shared/constants/rooms";
 import { COLORS, SCREENS } from "@shared-constants";
@@ -41,7 +39,6 @@ const styles = StyleSheet.create({
 
 export const DetailsScreen: React.FC<any> = ({ navigation, route }) => {
   const { roomId } = route.params;
-  const { user } = useUser();
   const room = ROOMS.find((x) => x.id === roomId);
   const { refresh } = useRefresh();
 
