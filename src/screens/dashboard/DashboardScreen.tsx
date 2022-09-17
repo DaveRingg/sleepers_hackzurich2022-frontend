@@ -1,0 +1,133 @@
+/* eslint-disable react-native/no-unused-styles */
+import React from "react";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import GradientText from "@shared-components/gradient-text/GradientText";
+import { fontStyles } from "shared/styles/fonts";
+import { useUser } from "api/useUser";
+import { InterText } from "@shared-components/inter-text/InterText";
+import { COLORS, SCREENS } from "@shared-constants";
+import { BlockNotification } from "@shared-components/blackout-notification/BlackoutNotification";
+import { InsightNotification } from "@shared-components/insight-notification/InsightNotification";
+import Icon from "react-native-dynamic-vector-icons";
+import LinearGradient from "react-native-linear-gradient";
+import { ScrollView } from "react-native-gesture-handler";
+import { RoomCard } from "@shared-components/room-card/RoomCard";
+import { ERoomStatus } from "types/room";
+import { navigate, push } from "react-navigation-helpers";
+import { ROOMS } from "shared/constants/rooms";
+
+const styles = StyleSheet.create({
+  notificationContainer: {
+    marginTop: 8,
+  },
+});
+
+const buttonStyles = (pressed: boolean) =>
+  StyleSheet.create({
+    button: {
+      width: 32,
+      height: 32,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: pressed ? "#D3E2E5" : "#DEE9EB",
+      borderRadius: 9999,
+    },
+  });
+
+export const DashboardScreen: React.FC<any> = ({ navigation }) => {
+  const { user } = useUser();
+
+  return (
+    <SafeAreaView
+      style={{
+        flex: 1,
+      }}
+    >
+      <ScrollView bouncesZoom={true} style={{ overflow: "visible" }}>
+        <View style={{ padding: 32 }}>
+          <View style={{ flexDirection: "row" }}>
+            <GradientText
+              colors={["#DE6019", "#EC9B60"]}
+              style={{ ...fontStyles.h1, marginBottom: 12 }}
+            >
+              Welcome back, {user!.name}
+            </GradientText>
+            <View style={{ flex: 1 }} />
+            <Pressable
+              onPress={() => {
+                navigation.navigate(SCREENS.OVERVIEW);
+              }}
+              style={({ pressed }) => buttonStyles(pressed).button}
+            >
+              <Icon type="Feather" name="bar-chart-2" size={15} />
+            </Pressable>
+          </View>
+
+          {/* ==================== NOTIFICATIONS ==================== */}
+          <InterText style={{ ...fontStyles.h3, marginTop: 30 }}>
+            Notifications
+          </InterText>
+          <View style={styles.notificationContainer}>
+            <BlockNotification time="20:21" progressText="32/53 KWh gathered" />
+            <InsightNotification
+              insightText="Your kitchen is consuming a high amount of energy"
+              actionButtonContent={
+                <Icon type="Feather" name="eye" size={14} color="#fff" />
+              }
+              style={{ marginTop: 6 }}
+            />
+          </View>
+
+          {/* ==================== Your Home ==================== */}
+          <View style={{ marginTop: 40 }}>
+            <InterText style={fontStyles.h2}>Your home</InterText>
+            <InterText style={fontStyles.subtitle}>{user!.address}</InterText>
+
+            <LinearGradient
+              colors={["#E6E7F2", "#EBECF8"]}
+              useAngle={true}
+              angle={140}
+              style={{
+                marginTop: 24,
+                marginHorizontal: -16,
+                paddingHorizontal: 16,
+                paddingVertical: 32,
+                borderRadius: 13,
+              }}
+            >
+              <Image
+                source={require("../../assets/images/home-full.png")}
+                style={{ width: "100%", height: 235, bottom: 0 }}
+                resizeMode="contain"
+              />
+            </LinearGradient>
+          </View>
+
+          {/* ==================== Your Rooms ==================== */}
+          <View style={{ marginTop: 32 }}>
+            <InterText style={fontStyles.h3}>Your rooms</InterText>
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginTop: 16,
+              }}
+            >
+              <RoomCard
+                room={ROOMS[0]}
+                style={{ marginRight: 12 }}
+                onPress={() =>
+                  navigation.push(SCREENS.DETAILS, { roomId: ROOMS[0].id })
+                }
+              />
+              <RoomCard room={ROOMS[1]} style={{ marginRight: 12 }} />
+              <RoomCard room={ROOMS[2]} />
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
