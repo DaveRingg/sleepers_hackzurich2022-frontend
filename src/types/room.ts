@@ -7,7 +7,7 @@ export enum ERoomStatus {
 export type Room = {
   id: string;
   name: string;
-  image: string;
+  image: any;
   status: ERoomStatus;
   schedules: Schedule[];
 };

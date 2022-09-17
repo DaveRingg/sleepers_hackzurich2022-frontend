@@ -14,6 +14,8 @@ import { COLORS, SCREENS } from "@shared-constants";
 import { Tag } from "@shared-components/tag/InterText";
 import { ScheduleBar } from "@shared-components/schedule-bar/ScheduleBar";
 import { useRefresh } from "hooks/use-refresh";
+import { Stat } from "@shared-components/stat/Stat";
+import { Achievement } from "@shared-components/achievement/Achievement";
 
 const buttonStyles = (pressed: boolean) =>
   StyleSheet.create({
@@ -26,15 +28,22 @@ const buttonStyles = (pressed: boolean) =>
   });
 
 const styles = StyleSheet.create({
-  buttonText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: COLORS.TEXT,
+  activityContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 14,
   },
-  scheduleAnnotation: {
-    fontSize: 10,
-    fontWeight: "500",
-    color: "#B9B9B9",
+  activityText: {
+    fontSize: 12,
+    fontWeight: "400",
+    color: COLORS.TEXT,
+    marginRight: 12,
+  },
+  activityLine: {
+    flex: 1,
+    height: 2,
+    borderRadius: 122,
+    backgroundColor: "#E5E5F0",
   },
 });
 
@@ -47,7 +56,7 @@ export const OverviewScreen: React.FC<any> = ({ navigation }) => {
     >
       <ScrollView style={{ overflow: "visible" }}>
         <View style={{ padding: 32 }}>
-          {/* ==================== Your room ==================== */}
+          {/* ==================== Your overview ==================== */}
           <View>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Pressable
@@ -62,28 +71,68 @@ export const OverviewScreen: React.FC<any> = ({ navigation }) => {
               30 kWh per day overall consumption
             </InterText>
 
-            <InterText style={fontStyles.h3}>
+            <InterText style={{ ...fontStyles.h3, marginTop: 26 }}>
               Your energy consumption this year
             </InterText>
 
-            <LinearGradient
-              colors={["#E6E7F2", "#EBECF8"]}
-              useAngle={true}
-              angle={140}
-              style={{
-                marginTop: 24,
-                marginHorizontal: -16,
-                paddingHorizontal: 16,
-                paddingVertical: 32,
-                borderRadius: 13,
-              }}
+            <Image
+              source={require("../../assets/images/chart-2.png")}
+              style={{ width: "100%", height: 100, marginTop: 12 }}
+              resizeMode="contain"
+            />
+          </View>
+
+          <View
+            style={{
+              marginTop: 32,
+              flexDirection: "row",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+            }}
+          >
+            <Stat top="You helped save" stat="89kWh" bottom="this year" />
+            <Stat top="You reclaimed" stat="154 CHF" bottom="since January" />
+            <Stat top="You offset" stat="3 KG" bottom="of CO₂" />
+          </View>
+
+          <View>
+            <InterText
+              style={{ ...fontStyles.h3, marginTop: 48, marginBottom: 16 }}
             >
-              <Image
-                source={require("../../assets/images/home-full.png")}
-                style={{ width: "100%", height: 235, bottom: 0 }}
-                resizeMode="contain"
-              />
-            </LinearGradient>
+              If you keep going like this{" "}
+            </InterText>
+
+            <View style={styles.activityContainer}>
+              <InterText style={styles.activityText}>
+                You’ll prevent 3 more blackouts
+              </InterText>
+              <View style={styles.activityLine} />
+            </View>
+            <View style={styles.activityContainer}>
+              <InterText style={styles.activityText}>
+                You’ll save 1300kW more
+              </InterText>
+              <View style={styles.activityLine} />
+            </View>
+            <View style={styles.activityContainer}>
+              <InterText style={styles.activityText}>
+                You’ll offset 2.8 more kg of CO₂
+              </InterText>
+              <View style={styles.activityLine} />
+            </View>
+          </View>
+
+          <View style={{ marginTop: 48 }}>
+            <InterText style={fontStyles.h3}>Your achievements</InterText>
+            <View
+              style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 12 }}
+            >
+              <Achievement id="1" />
+              <Achievement id="2" />
+              <Achievement id="3" />
+              <Achievement id="4" />
+              <Achievement id="5" />
+            </View>
           </View>
         </View>
       </ScrollView>

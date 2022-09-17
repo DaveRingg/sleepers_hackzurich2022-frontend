@@ -21,19 +21,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#EDEEF7",
     color: "#fff",
     flex: 1,
-    paddingVertical: 24,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 12,
+    minWidth: 90,
+    height: 130,
   },
   containerPressed: {
     backgroundColor: "#e9eaf5",
     color: "#fff",
     flex: 1,
-    paddingVertical: 24,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 12,
+    minWidth: 90,
+    height: 130,
   },
   title: {
     marginTop: 10,
@@ -60,7 +62,7 @@ export const RoomCard = ({ room, style, ...rest }: RoomCardProps) => {
       ]}
     >
       <Image
-        source={require("../../../assets/images/kitchen.png")}
+        source={room.image}
         style={{ width: 40, height: 40 }}
         resizeMode="contain"
       />

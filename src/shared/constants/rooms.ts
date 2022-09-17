@@ -2,9 +2,9 @@ import { ERoomStatus, Room } from "types/room";
 
 export const ROOMS: Room[] = [
   {
-    id: "kitchen",
-    image: "../../assets/images/kitchen.png",
-    name: "Kitchen",
+    id: "livingroom",
+    image: require("../../assets/images/room.png"),
+    name: "Living Room",
     schedules: [
       {
         id: "a",
@@ -25,9 +25,9 @@ export const ROOMS: Room[] = [
     status: ERoomStatus.ON,
   },
   {
-    id: "living",
-    image: "../../assets/images/room.png",
-    name: "Living Room",
+    id: "bedroom",
+    image: require("../../assets/images/bedroom.png"),
+    name: "Bedroom",
     schedules: [
       {
         id: "a",
@@ -48,9 +48,23 @@ export const ROOMS: Room[] = [
     status: ERoomStatus.IDLE,
   },
   {
+    id: "kitchen",
+    image: require("../../assets/images/kitchen.png"),
+    name: "Kitchen",
+    schedules: [],
+    status: ERoomStatus.IDLE,
+  },
+  {
     id: "office",
-    image: "../../assets/images/workspace.png",
+    image: require("../../assets/images/workspace.png"),
     name: "Office",
+    schedules: [],
+    status: ERoomStatus.IDLE,
+  },
+  {
+    id: "bathroom",
+    image: require("../../assets/images/bath.png"),
+    name: "Bathroom",
     schedules: [],
     status: ERoomStatus.IDLE,
   },

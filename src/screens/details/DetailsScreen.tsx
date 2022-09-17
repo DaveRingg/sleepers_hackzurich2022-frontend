@@ -8,13 +8,17 @@ import { InterText } from "@shared-components/inter-text/InterText";
 import Icon from "react-native-dynamic-vector-icons";
 import LinearGradient from "react-native-linear-gradient";
 import { ScrollView } from "react-native-gesture-handler";
-import { RoomCard } from "@shared-components/room-card/RoomCard";
-import { ERoomStatus } from "types/room";
-import { ROOMS } from "shared/constants/rooms";
+import { ERoomStatus, Room } from "types/room";
 import { COLORS, SCREENS } from "@shared-constants";
 import { Tag } from "@shared-components/tag/InterText";
 import { ScheduleBar } from "@shared-components/schedule-bar/ScheduleBar";
-import { useRefresh } from "hooks/use-refresh";
+import {
+  BUTTON_POSITION_STYLES,
+  InteractiveMap,
+} from "@shared-components/interactive-map/InteractiveMap";
+import { useRooms } from "api/useRooms";
+import { arrayUpsert } from "utils/array";
+import { StatusButton } from "@shared-components/status-button/StatusButton";
 
 const buttonStyles = (pressed: boolean) =>
   StyleSheet.create({
@@ -42,8 +46,8 @@ const styles = StyleSheet.create({
 export const DetailsScreen: React.FC<any> = ({ navigation, route }) => {
   const { roomId } = route.params;
   const { user } = useUser();
-  const room = ROOMS.find((x) => x.id === roomId);
-  const { refresh } = useRefresh();
+  const { rooms, mutate } = useRooms();
+  const room = rooms.find((x) => x.id === roomId);
 
   let statusText = "Idle";
   let tagColor = "blue";
@@ -63,14 +67,28 @@ export const DetailsScreen: React.FC<any> = ({ navigation, route }) => {
 
   const handleChangeState = useCallback(() => {
     if (room!.status === ERoomStatus.ON) {
-      room!.status = ERoomStatus.IDLE;
+      mutate((r) => arrayUpsert(r, { ...room!, status: ERoomStatus.IDLE })!);
     } else {
-      room!.status = ERoomStatus.ON;
+      mutate((r) => arrayUpsert(r, { ...room!, status: ERoomStatus.ON })!);
     }
+  }, [mutate, room]);
 
-    refresh();
-  }, [refresh, room]);
+  const getRoomMode = (room: Room, check: string) =>
+    room.id === check
+      ? room.status === ERoomStatus.ON
+        ? "Active"
+        : "Off"
+      : "Transparent";
 
+  const toggleRoomMode = (room: Room) => () =>
+    mutate(
+      (r) =>
+        arrayUpsert(r, {
+          ...room,
+          status:
+            room.status === ERoomStatus.ON ? ERoomStatus.IDLE : ERoomStatus.ON,
+        })!,
+    );
   return (
     <SafeAreaView
       style={{
@@ -127,11 +145,20 @@ export const DetailsScreen: React.FC<any> = ({ navigation, route }) => {
                 borderRadius: 13,
               }}
             >
-              <Image
-                source={require("../../assets/images/home-full.png")}
-                style={{ width: "100%", height: 235, bottom: 0 }}
-                resizeMode="contain"
-              />
+              <View style={{ position: "relative" }}>
+                <InteractiveMap
+                  bathroom={getRoomMode(room!, "bathroom")}
+                  kitchen={getRoomMode(room!, "kitchen")}
+                  bedroom={getRoomMode(room!, "bedroom")}
+                  livingroom={getRoomMode(room!, "livingroom")}
+                  office={getRoomMode(room!, "office")}
+                />
+                <StatusButton
+                  status={room!.status}
+                  style={(BUTTON_POSITION_STYLES as any)[room!.id]}
+                  onPress={toggleRoomMode(room!)}
+                />
+              </View>
             </LinearGradient>
           </View>
 

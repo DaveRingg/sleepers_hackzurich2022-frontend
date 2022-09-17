@@ -1,21 +1,26 @@
 /* eslint-disable react-native/no-unused-styles */
 import React from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GradientText from "@shared-components/gradient-text/GradientText";
 import { fontStyles } from "shared/styles/fonts";
 import { useUser } from "api/useUser";
 import { InterText } from "@shared-components/inter-text/InterText";
-import { COLORS, SCREENS } from "@shared-constants";
+import { SCREENS } from "@shared-constants";
 import { BlockNotification } from "@shared-components/blackout-notification/BlackoutNotification";
 import { InsightNotification } from "@shared-components/insight-notification/InsightNotification";
 import Icon from "react-native-dynamic-vector-icons";
 import LinearGradient from "react-native-linear-gradient";
 import { ScrollView } from "react-native-gesture-handler";
 import { RoomCard } from "@shared-components/room-card/RoomCard";
-import { ERoomStatus } from "types/room";
-import { navigate, push } from "react-navigation-helpers";
-import { ROOMS } from "shared/constants/rooms";
+import { ERoomStatus, Room } from "types/room";
+import {
+  BUTTON_POSITION_STYLES,
+  InteractiveMap,
+} from "@shared-components/interactive-map/InteractiveMap";
+import { StatusButton } from "@shared-components/status-button/StatusButton";
+import { useRooms } from "api/useRooms";
+import { arrayUpsert } from "utils/array";
 
 const styles = StyleSheet.create({
   notificationContainer: {
@@ -37,6 +42,17 @@ const buttonStyles = (pressed: boolean) =>
 
 export const DashboardScreen: React.FC<any> = ({ navigation }) => {
   const { user } = useUser();
+  const { rooms, mutate } = useRooms();
+
+  const toggleRoomMode = (room: Room) => () =>
+    mutate(
+      (r) =>
+        arrayUpsert(r, {
+          ...room,
+          status:
+            room.status === ERoomStatus.ON ? ERoomStatus.IDLE : ERoomStatus.ON,
+        })!,
+    );
 
   return (
     <SafeAreaView
@@ -96,11 +112,48 @@ export const DashboardScreen: React.FC<any> = ({ navigation }) => {
                 borderRadius: 13,
               }}
             >
-              <Image
-                source={require("../../assets/images/home-full.png")}
-                style={{ width: "100%", height: 235, bottom: 0 }}
-                resizeMode="contain"
-              />
+              <View style={{ position: "relative" }}>
+                <InteractiveMap
+                  kitchen={
+                    rooms[2].status === ERoomStatus.ON ? "Active" : "Off"
+                  }
+                  bathroom={
+                    rooms[4].status === ERoomStatus.ON ? "Active" : "Off"
+                  }
+                  bedroom={
+                    rooms[1].status === ERoomStatus.ON ? "Active" : "Off"
+                  }
+                  livingroom={
+                    rooms[0].status === ERoomStatus.ON ? "Active" : "Off"
+                  }
+                  office={rooms[3].status === ERoomStatus.ON ? "Active" : "Off"}
+                />
+                <StatusButton
+                  status={rooms[0].status}
+                  style={BUTTON_POSITION_STYLES.livingroom}
+                  onPress={toggleRoomMode(rooms[0])}
+                />
+                <StatusButton
+                  status={rooms[1].status}
+                  style={BUTTON_POSITION_STYLES.bedroom}
+                  onPress={toggleRoomMode(rooms[1])}
+                />
+                <StatusButton
+                  status={rooms[2].status}
+                  style={BUTTON_POSITION_STYLES.kitchen}
+                  onPress={toggleRoomMode(rooms[2])}
+                />
+                <StatusButton
+                  status={rooms[3].status}
+                  style={BUTTON_POSITION_STYLES.office}
+                  onPress={toggleRoomMode(rooms[3])}
+                />
+                <StatusButton
+                  status={rooms[4].status}
+                  style={BUTTON_POSITION_STYLES.bathroom}
+                  onPress={toggleRoomMode(rooms[4])}
+                />
+              </View>
             </LinearGradient>
           </View>
 
@@ -112,18 +165,44 @@ export const DashboardScreen: React.FC<any> = ({ navigation }) => {
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
+                flexWrap: "wrap",
                 marginTop: 16,
               }}
             >
               <RoomCard
-                room={ROOMS[0]}
-                style={{ marginRight: 12 }}
+                room={rooms[0]}
+                style={{ marginRight: 12, marginBottom: 12 }}
                 onPress={() =>
-                  navigation.push(SCREENS.DETAILS, { roomId: ROOMS[0].id })
+                  navigation.push(SCREENS.DETAILS, { roomId: rooms[0].id })
                 }
               />
-              <RoomCard room={ROOMS[1]} style={{ marginRight: 12 }} />
-              <RoomCard room={ROOMS[2]} />
+              <RoomCard
+                room={rooms[1]}
+                style={{ marginRight: 12, marginBottom: 12 }}
+                onPress={() =>
+                  navigation.push(SCREENS.DETAILS, { roomId: rooms[1].id })
+                }
+              />
+              <RoomCard
+                room={rooms[2]}
+                style={{ marginRight: 12, marginBottom: 12 }}
+                onPress={() =>
+                  navigation.push(SCREENS.DETAILS, { roomId: rooms[2].id })
+                }
+              />
+              <RoomCard
+                room={rooms[3]}
+                style={{ marginRight: 12 }}
+                onPress={() =>
+                  navigation.push(SCREENS.DETAILS, { roomId: rooms[3].id })
+                }
+              />
+              <RoomCard
+                room={rooms[4]}
+                onPress={() =>
+                  navigation.push(SCREENS.DETAILS, { roomId: rooms[4].id })
+                }
+              />
             </View>
           </View>
         </View>
