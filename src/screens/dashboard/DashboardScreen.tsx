@@ -1,17 +1,24 @@
 /* eslint-disable react-native/no-unused-styles */
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import {
+  Alert,
+  LayoutAnimation,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GradientText from "@shared-components/gradient-text/GradientText";
 import { fontStyles } from "shared/styles/fonts";
 import { useUser } from "api/useUser";
 import { InterText } from "@shared-components/inter-text/InterText";
 import { SCREENS } from "@shared-constants";
-import { BlockNotification } from "@shared-components/blackout-notification/BlackoutNotification";
+import { BlackoutNotification } from "@shared-components/blackout-notification/BlackoutNotification";
 import { InsightNotification } from "@shared-components/insight-notification/InsightNotification";
 import Icon from "react-native-dynamic-vector-icons";
 import LinearGradient from "react-native-linear-gradient";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, Swipeable } from "react-native-gesture-handler";
 import { RoomCard } from "@shared-components/room-card/RoomCard";
 import { ERoomStatus, Room } from "types/room";
 import {
@@ -21,6 +28,13 @@ import {
 import { StatusButton } from "@shared-components/status-button/StatusButton";
 import { useRooms } from "api/useRooms";
 import { arrayUpsert } from "utils/array";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  Layout,
+  ZoomIn,
+} from "react-native-reanimated";
+import { useNotifications } from "api/useNotifications";
 
 const styles = StyleSheet.create({
   notificationContainer: {
@@ -40,9 +54,49 @@ const buttonStyles = (pressed: boolean) =>
     },
   });
 
-export const DashboardScreen: React.FC<any> = ({ navigation }) => {
+export const DashboardScreen: React.FC<any> = ({ navigation, route }) => {
   const { user } = useUser();
   const { rooms, mutate } = useRooms();
+  const {
+    notifications,
+    addBlackoutNotification,
+    addInsightNotification,
+    removeInsightNotification,
+  } = useNotifications();
+  const { params } = route;
+
+  useEffect(() => {
+    if (params) {
+      // removeBlackoutNotification();
+    }
+  }, [params]);
+
+  const target =
+    (10.0 -
+      rooms.reduce((p, x) => p + (x.status === ERoomStatus.ON ? 1 : 0), 0)) /
+    9.0;
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      addBlackoutNotification();
+    }, 15000);
+    const q = setTimeout(() => {
+      addInsightNotification();
+    }, 18000);
+
+    return () => {
+      clearTimeout(t);
+      clearTimeout(q);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (rooms[2].status === ERoomStatus.IDLE) {
+      removeInsightNotification();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rooms[2].status]);
 
   const toggleRoomMode = (room: Room) => () =>
     mutate(
@@ -81,29 +135,49 @@ export const DashboardScreen: React.FC<any> = ({ navigation }) => {
           </View>
 
           {/* ==================== NOTIFICATIONS ==================== */}
-          <InterText style={{ ...fontStyles.h3, marginTop: 30 }}>
-            Notifications
-          </InterText>
+          {notifications.length > 0 && (
+            <Animated.View entering={FadeIn} exiting={FadeOut.duration(300)}>
+              <InterText style={{ ...fontStyles.h3, marginTop: 30 }}>
+                Notifications
+              </InterText>
+            </Animated.View>
+          )}
           <View style={styles.notificationContainer}>
-            <BlockNotification
-              time="20:21"
-              progressText="32/53 KWh gathered"
-              navigation={navigation}
-            />
-            <InsightNotification
-              insightText="Your kitchen is consuming a high amount of energy"
-              actionButtonContent={
-                <Icon type="Feather" name="eye" size={14} color="#fff" />
-              }
-              onPressAction={() =>
-                navigation.navigate(SCREENS.DETAILS, { roomId: rooms[2].id })
-              }
-              style={{ marginTop: 6 }}
-            />
+            {notifications.map((notification) => (
+              <>
+                {notification.type === "blackout" && (
+                  <BlackoutNotification
+                    key={notification.type}
+                    time="20:21"
+                    progressText={`${Math.round(target * 53)}/53 KWh gathered`}
+                    progress={target}
+                    navigation={navigation}
+                  />
+                )}
+                {notification.type === "highconsumption" && (
+                  <InsightNotification
+                    key={notification.type}
+                    insightText="Your kitchen is consuming a high amount of energy"
+                    actionButtonContent={
+                      <Icon type="Feather" name="eye" size={14} color="#fff" />
+                    }
+                    onPressAction={() =>
+                      navigation.navigate(SCREENS.DETAILS, {
+                        roomId: rooms[2].id,
+                      })
+                    }
+                    style={{ marginTop: 6 }}
+                  />
+                )}
+              </>
+            ))}
           </View>
 
           {/* ==================== Your Home ==================== */}
-          <View style={{ marginTop: 40 }}>
+          <Animated.View
+            layout={Layout.springify().duration(400)}
+            style={{ marginTop: notifications.length > 0 ? 40 : 16 }}
+          >
             <InterText style={fontStyles.h2}>Your home</InterText>
             <InterText style={fontStyles.subtitle}>{user!.address}</InterText>
 
@@ -162,10 +236,13 @@ export const DashboardScreen: React.FC<any> = ({ navigation }) => {
                 />
               </View>
             </LinearGradient>
-          </View>
+          </Animated.View>
 
           {/* ==================== Your Rooms ==================== */}
-          <View style={{ marginTop: 32 }}>
+          <Animated.View
+            layout={Layout.springify().duration(400)}
+            style={{ marginTop: 32 }}
+          >
             <InterText style={fontStyles.h3}>Your rooms</InterText>
 
             <View
@@ -211,7 +288,7 @@ export const DashboardScreen: React.FC<any> = ({ navigation }) => {
                 }
               />
             </View>
-          </View>
+          </Animated.View>
         </View>
       </ScrollView>
     </SafeAreaView>

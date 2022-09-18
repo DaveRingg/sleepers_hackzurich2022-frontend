@@ -1,6 +1,11 @@
 import { COLORS } from "@shared-constants";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { StyleProp, StyleSheet, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 interface ProgressBarProps {
   progress: number;
@@ -43,16 +48,25 @@ const styles = StyleSheet.create({
 });
 
 export const ProgressBar = ({ progress, mode, ...rest }: ProgressBarProps) => {
+  const v = useSharedValue(0);
+
+  useEffect(() => {
+    v.value = progress;
+  }, [progress, v]);
+
+  const animStyle = useAnimatedStyle(() => {
+    return {
+      flex: withSpring(100 - Math.round(v.value * 100)),
+    };
+  });
+
   const thumbStyle = useMemo(
     () => ({
       thumbContent: {
         flex: Math.round(progress * 100),
         height: "100%",
         borderRadius: 9999,
-        backgroundColor: COLORS.PRIMARY,
-      },
-      thumbFiller: {
-        flex: 100 - Math.round(progress * 100),
+        backgroundColor: COLORS.PRIMARY_ACTIVE,
       },
     }),
     [progress],
@@ -63,7 +77,7 @@ export const ProgressBar = ({ progress, mode, ...rest }: ProgressBarProps) => {
       <View style={mode === "dark" ? darkStyles.track : lightStyles.track} />
       <View style={styles.thumb}>
         <View style={thumbStyle.thumbContent} />
-        <View style={thumbStyle.thumbFiller} />
+        <Animated.View style={animStyle} />
       </View>
     </View>
   );

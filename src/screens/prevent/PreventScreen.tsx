@@ -1,8 +1,7 @@
 /* eslint-disable react-native/no-unused-styles */
-import React from "react";
-import { Image, Pressable, StyleSheet, View } from "react-native";
+import React, { useEffect } from "react";
+import { Alert, Image, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import GradientText from "@shared-components/gradient-text/GradientText";
 import { fontStyles } from "shared/styles/fonts";
 import { useUser } from "api/useUser";
 import { InterText } from "@shared-components/inter-text/InterText";
@@ -11,10 +10,21 @@ import Icon from "react-native-dynamic-vector-icons";
 import LinearGradient from "react-native-linear-gradient";
 import { ScrollView } from "react-native-gesture-handler";
 import { ProgressBar } from "@shared-components/progress-bar/ProgressBar";
+import { useRooms } from "api/useRooms";
+import { ERoomStatus, Room } from "types/room";
+import {
+  BUTTON_POSITION_STYLES,
+  InteractiveMap,
+} from "@shared-components/interactive-map/InteractiveMap";
+import { StatusButton } from "@shared-components/status-button/StatusButton";
+import { arrayUpsert } from "utils/array";
+import { BlackoutNotification } from "@shared-components/blackout-notification/BlackoutNotification";
+import Animated, { Layout } from "react-native-reanimated";
 
 const styles = StyleSheet.create({
   notificationContainer: {
     marginTop: 8,
+    flexDirection: "column",
   },
 });
 
@@ -33,6 +43,23 @@ const buttonStyles = (pressed: boolean) =>
 export const PreventScreen: React.FC<any> = ({ navigation }) => {
   const { user } = useUser();
 
+  const { rooms, mutate } = useRooms();
+
+  const target =
+    (10.0 -
+      rooms.reduce((p, x) => p + (x.status === ERoomStatus.ON ? 1 : 0), 0)) /
+    9.0;
+
+  const toggleRoomMode = (room: Room) => () =>
+    mutate(
+      (r) =>
+        arrayUpsert(r, {
+          ...room,
+          status:
+            room.status === ERoomStatus.ON ? ERoomStatus.IDLE : ERoomStatus.ON,
+        })!,
+    );
+
   return (
     <SafeAreaView
       style={{
@@ -41,19 +68,16 @@ export const PreventScreen: React.FC<any> = ({ navigation }) => {
     >
       <ScrollView bouncesZoom={true} style={{ overflow: "visible" }}>
         <View style={{ padding: 32 }}>
-          <View style={{ flexDirection: "row" }}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Pressable
-              onPress={() => navigation.navigate(SCREENS.DASHBOARD)}
+              onPress={() => navigation.navigate(SCREENS.DASHBOARD, "yem")}
               style={{ paddingRight: 12 }}
             >
               <Icon type="Feather" name="arrow-left" color="#333" />
             </Pressable>
-            <GradientText
-              colors={["#DE6019", "#EC9B60"]}
-              style={{ ...fontStyles.h1, marginBottom: 12 }}
-            >
-              Welcome back, {user!.name}
-            </GradientText>
+            <InterText style={{ ...fontStyles.h2 }}>
+              Blackout prevention
+            </InterText>
             <View style={{ flex: 1 }} />
             <Pressable
               onPress={() => {
@@ -70,25 +94,45 @@ export const PreventScreen: React.FC<any> = ({ navigation }) => {
             <InterText style={{ ...fontStyles.h3, marginTop: 30 }}>
               Ammount needed
             </InterText>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 10,
+              }}
+            >
               <ProgressBar
                 mode="light"
                 style={{
                   ...fontStyles.h3,
-                  marginTop: 10,
                   marginRight: 10,
                   flex: 1,
                 }}
-                progress={0.6}
+                progress={target}
               />
-              <InterText style={{ ...fontStyles.h3 }}>
-                32/53 KWh gathered
+              <InterText style={{ ...fontStyles.h3, fontSize: 9 }}>
+                {Math.round(target * 53)}/53 KWh gathered
               </InterText>
             </View>
           </View>
 
+          <Animated.View
+            layout={Layout.duration(300).springify()}
+            style={{ marginTop: 16 }}
+          >
+            <BlackoutNotification
+              navigation={navigation}
+              progress={target}
+              time="20:21"
+              progressText={`${Math.round(target * 53)}/53 KWh gathered`}
+            />
+          </Animated.View>
+
           {/* ==================== Your Home ==================== */}
-          <View style={{ marginTop: 40 }}>
+          <Animated.View
+            layout={Layout.duration(300).springify()}
+            style={{ marginTop: 40 }}
+          >
             <InterText style={fontStyles.h2}>Your home</InterText>
             <InterText style={fontStyles.subtitle}>{user!.address}</InterText>
 
@@ -104,43 +148,107 @@ export const PreventScreen: React.FC<any> = ({ navigation }) => {
                 borderRadius: 13,
               }}
             >
-              <Image
-                source={require("../../assets/images/home-full.png")}
-                style={{ width: "100%", height: 235, bottom: 0 }}
-                resizeMode="contain"
-              />
+              <View style={{ position: "relative" }}>
+                <InteractiveMap
+                  kitchen={
+                    rooms[2].status === ERoomStatus.ON ? "Active" : "Off"
+                  }
+                  bathroom={
+                    rooms[4].status === ERoomStatus.ON ? "Active" : "Off"
+                  }
+                  bedroom={
+                    rooms[1].status === ERoomStatus.ON ? "Active" : "Off"
+                  }
+                  livingroom={
+                    rooms[0].status === ERoomStatus.ON ? "Active" : "Off"
+                  }
+                  office={rooms[3].status === ERoomStatus.ON ? "Active" : "Off"}
+                />
+                <StatusButton
+                  status={rooms[0].status}
+                  style={BUTTON_POSITION_STYLES.livingroom}
+                  onPress={toggleRoomMode(rooms[0])}
+                />
+                <StatusButton
+                  status={rooms[1].status}
+                  style={BUTTON_POSITION_STYLES.bedroom}
+                  onPress={toggleRoomMode(rooms[1])}
+                />
+                <StatusButton
+                  status={rooms[2].status}
+                  style={BUTTON_POSITION_STYLES.kitchen}
+                  onPress={toggleRoomMode(rooms[2])}
+                />
+                <StatusButton
+                  status={rooms[3].status}
+                  style={BUTTON_POSITION_STYLES.office}
+                  onPress={toggleRoomMode(rooms[3])}
+                />
+                <StatusButton
+                  status={rooms[4].status}
+                  style={BUTTON_POSITION_STYLES.bathroom}
+                  onPress={toggleRoomMode(rooms[4])}
+                />
+              </View>
             </LinearGradient>
-          </View>
+          </Animated.View>
 
           {/* ==================== Your Savings ==================== */}
-          <View style={styles.notificationContainer}>
+          <Animated.View
+            layout={Layout.duration(300).springify()}
+            style={styles.notificationContainer}
+          >
             <InterText style={{ ...fontStyles.h3, marginTop: 30 }}>
               Your potential savings
             </InterText>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 10,
+              }}
+            >
               <ProgressBar
                 mode="light"
                 style={{
                   ...fontStyles.h3,
-                  marginTop: 10,
                   marginRight: 10,
                   flex: 1,
                 }}
                 progress={0.73}
               />
-              <InterText style={{ ...fontStyles.h3 }}>17/23 KWh</InterText>
+              <InterText style={{ ...fontStyles.h3, fontSize: 10 }}>
+                17/23 KWh
+              </InterText>
             </View>
-          </View>
-          <View style={styles.notificationContainer}>
-            <InterText style={{ ...fontStyles.h3, marginTop: 10 }}>
+          </Animated.View>
+
+          <Animated.View
+            layout={Layout.duration(300).springify()}
+            style={styles.notificationContainer}
+          >
+            <InterText
+              style={{
+                ...fontStyles.h3,
+                opacity: 0.5,
+                fontSize: 11,
+                marginTop: 10,
+              }}
+            >
               Saving Split
             </InterText>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 12,
+                marginBottom: 12,
+              }}
+            >
               <ProgressBar
                 mode="light"
                 style={{
                   ...fontStyles.h3,
-                  margin: 10,
                   marginRight: 10,
                   flex: 2,
                 }}
@@ -150,12 +258,17 @@ export const PreventScreen: React.FC<any> = ({ navigation }) => {
                 Kitchen
               </InterText>
             </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 12,
+              }}
+            >
               <ProgressBar
                 mode="light"
                 style={{
                   ...fontStyles.h3,
-                  margin: 10,
                   marginRight: 10,
                   flex: 2,
                 }}
@@ -165,12 +278,17 @@ export const PreventScreen: React.FC<any> = ({ navigation }) => {
                 Office
               </InterText>
             </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 12,
+              }}
+            >
               <ProgressBar
                 mode="light"
                 style={{
                   ...fontStyles.h3,
-                  margin: 10,
                   marginRight: 10,
                   flex: 2,
                 }}
@@ -180,12 +298,17 @@ export const PreventScreen: React.FC<any> = ({ navigation }) => {
                 Living Room
               </InterText>
             </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 12,
+              }}
+            >
               <ProgressBar
                 mode="light"
                 style={{
                   ...fontStyles.h3,
-                  margin: 10,
                   marginRight: 10,
                   flex: 2,
                 }}
@@ -195,7 +318,7 @@ export const PreventScreen: React.FC<any> = ({ navigation }) => {
                 Batchroom
               </InterText>
             </View>
-          </View>
+          </Animated.View>
         </View>
       </ScrollView>
     </SafeAreaView>

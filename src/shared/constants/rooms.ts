@@ -27,7 +27,7 @@ export const ROOMS: Room[] = [
   {
     id: "bedroom",
     image: require("../../assets/images/bedroom.png"),
-    status: ERoomStatus.IDLE,
+    status: ERoomStatus.ON,
     name: "Bedroom",
     schedules: [
       {
@@ -52,13 +52,13 @@ export const ROOMS: Room[] = [
     image: require("../../assets/images/kitchen.png"),
     name: "Kitchen",
     schedules: [],
-    status: ERoomStatus.IDLE,
+    status: ERoomStatus.ON,
   },
   {
     id: "office",
     image: require("../../assets/images/workspace.png"),
     name: "Office",
-    status: ERoomStatus.IDLE,
+    status: ERoomStatus.ON,
     schedules: [],
   },
   {
@@ -66,6 +66,6 @@ export const ROOMS: Room[] = [
     image: require("../../assets/images/bath.png"),
     name: "Bathroom",
     schedules: [],
-    status: ERoomStatus.IDLE,
+    status: ERoomStatus.ON,
   },
 ];

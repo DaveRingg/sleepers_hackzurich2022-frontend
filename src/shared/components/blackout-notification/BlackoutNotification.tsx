@@ -1,13 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { COLORS, SCREENS } from "@shared-constants";
 import { Notification } from "@shared-components/notification/Notification";
 import { InterText } from "@shared-components/inter-text/InterText";
 import { ProgressBar } from "@shared-components/progress-bar/ProgressBar";
+import Animated, {
+  FadeOutRight,
+  FadeOut,
+  FadeInLeft,
+} from "react-native-reanimated";
 
 interface BlackoutNotificationProps {
   time: string;
   progressText: string;
+  progress: number;
   navigation: any;
 }
 
@@ -49,64 +55,98 @@ const styles = StyleSheet.create({
   },
 });
 
-export const BlockNotification = ({
+export const BlackoutNotification = ({
   time,
   progressText,
+  progress,
   navigation,
 }: BlackoutNotificationProps) => {
   return (
     <Notification
+      variant={progress < 1.0 ? "alert" : "celebration"}
       title={
-        <View>
-          <InterText style={styles.notificationText}>
-            Possible{" "}
-            <InterText style={styles.notificationTextHighlight}>
-              blackout
-            </InterText>{" "}
-            at{" "}
-            <InterText style={styles.notificationTextHighlight}>
-              {time}
+        progress < 1.0 ? (
+          <Animated.View
+            key={"less"}
+            exiting={FadeOutRight.duration(400)}
+            entering={FadeInLeft.duration(400)}
+          >
+            <InterText style={styles.notificationText}>
+              Possible{" "}
+              <InterText style={styles.notificationTextHighlight}>
+                blackout
+              </InterText>{" "}
+              at{" "}
+              <InterText style={styles.notificationTextHighlight}>
+                {time}
+              </InterText>
             </InterText>
-          </InterText>
-        </View>
+          </Animated.View>
+        ) : (
+          <Animated.View
+            key="more"
+            entering={FadeInLeft.duration(400)}
+            exiting={FadeOutRight.duration(400)}
+            style={{ paddingRight: 18 }}
+          >
+            <InterText style={styles.notificationText}>
+              Thank you!{" "}
+              <InterText style={{ fontWeight: "900", color: COLORS.PRIMARY }}>
+                You
+              </InterText>{" "}
+              helped us take a big step towards preventing the comming blackout!
+            </InterText>
+          </Animated.View>
+        )
       }
       titleAction={
-        <Pressable
-          onPress={() => navigation.navigate(SCREENS.PREVENT)}
-          style={({ pressed }) => ({
-            ...styles.notificationButton,
-            backgroundColor: pressed ? COLORS.PRIMARY_ACTIVE : COLORS.PRIMARY,
-          })}
-        >
-          <InterText style={styles.notificationButtonText}>
-            Help prevent
-          </InterText>
-        </Pressable>
+        progress < 1.0 && (
+          <Animated.View exiting={FadeOut}>
+            <Pressable
+              onPress={() => navigation.navigate(SCREENS.PREVENT)}
+              style={({ pressed }) => ({
+                ...styles.notificationButton,
+                backgroundColor: pressed
+                  ? COLORS.PRIMARY_ACTIVE
+                  : COLORS.PRIMARY,
+              })}
+            >
+              <InterText style={styles.notificationButtonText}>
+                Help prevent
+              </InterText>
+            </Pressable>
+          </Animated.View>
+        )
       }
       description={
-        <View>
-          <InterText style={styles.notificationDescriptionText}>
-            We need your help! Put any non-critical rooms to idle so we can
-            reroute that energy to critical facilities. Saving 53 KWh could
-            prevent the blackout
-          </InterText>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginTop: 12,
-            }}
+        progress < 1.0 && (
+          <Animated.View
+            exiting={FadeOutRight}
+            entering={FadeInLeft.duration(400).delay(200)}
           >
-            <ProgressBar
-              progress={0.9}
-              mode="dark"
-              style={styles.progressBar}
-            />
-            <InterText style={styles.notificationPBText}>
-              {progressText}
+            <InterText style={styles.notificationDescriptionText}>
+              We need your help! Put any non-critical rooms to idle so we can
+              reroute that energy to critical facilities. Saving 53 KWh could
+              prevent the blackout
             </InterText>
-          </View>
-        </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 12,
+              }}
+            >
+              <ProgressBar
+                progress={progress}
+                mode="dark"
+                style={styles.progressBar}
+              />
+              <InterText style={styles.notificationPBText}>
+                {progressText}
+              </InterText>
+            </View>
+          </Animated.View>
+        )
       }
     />
   );

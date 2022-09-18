@@ -5853,7 +5853,7 @@
   dependencies:
     "react-localization" "^1.0.17"
 
-"react-native-reanimated@^2.9.1":
+"react-native-reanimated@^2.10.0":
   "integrity" "sha512-jKm3xz5nX7ABtHzzuuLmawP0pFWP77lXNdIC6AWOceBs23OHUaJ29p4prxr/7Sb588GwTbkPsYkDqVFaE3ezNQ=="
   "resolved" "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-2.10.0.tgz"
   "version" "2.10.0"
